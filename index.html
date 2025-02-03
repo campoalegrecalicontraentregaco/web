@@ -209,63 +209,105 @@
 
     <div class="container">
         <header>
-            <h1>@campoalegrecali</h1>
-            <p>	Local: Vereda Campoalegre, Corregimiento Montebello, Cali, Valle Del Cauca, Colombia</p>
+            <h1>@bodegascali</h1>
+            <p>	Punto: Vereda Campoalegre, Oeste Cali, Valle, Colombia</p>
         </header>
 
         <!-- Enlaces -->
         <div class="buttons">
-            <a href="https://wa.me/573215970535" target="_blank" aria-label="Contactar por WhatsApp">WHATSAPP</a>
+            <a href="https://wa.me/573215970535" target="_blank">WHATSAPP</a>
             <a href="tel:+573215970535" target="_blank">LLAMAR</a>
         </div>
-        
-
-
-
+   
+    
     
     <!-- Buscador de contactos -->
 <form onsubmit="searchContacts(); return false;">
     <div class="search-bar">
-        <input type="text" id="searchContactInput" placeholder="Buscar socios...">
+        <input type="text" id="searchContactInput" placeholder="Buscar inventario...">
         <button type="submit">Buscar</button>
     </div>
 </form>
+
         
 <!-- Contactos -->
         <section>
-            <h2>Socios</h2>
+            <h2>Inventario</h2>
             <table>
                 <thead>
                     <tr>
+                        <th>Código</th>
                         <th>Nombre</th>
-                        <th>Licencia</th>
-                        <th>Teléfono</th>
-                        <th>Categorías</th>
+                        <th>Ubicación</th>
+                        <th>Detalles</th>
+                        <th>Precio</th>
+                        <th>Stock</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr>
-                        <td><a href="https://bodegascali.contraentregaco.com" class="clickable" target="_blank" rel="noopener noreferrer">1. @bodegascali</a></td>
-                        <td>Socio</td>
-                        <td></td>
-                        <td></td>
+                        <td><a href="sku-1/sku-1-18L4LbBf3e9Udq7zobRPVah3CBfvDRMaZCcuj5As8xHbgJ4rzKvBvZH1.html" class="clickable" target="_blank" rel="noopener noreferrer">1</a></td>
+                        <td>Juguetería, Piñatería, Hogar, Salud y Belleza</td>
+                        <td>-</td>
+                        <td>+573105938658</td>
+                        <td>-</td>
+                        <td>-</td>
                     </tr>
 <tr>
-                        <td><a href="https://ferreteriascampoalegrecali.contraentregaco.com" class="clickable" target="_blank" rel="noopener noreferrer">2. @ferreteriascampoalegrecali</a></td>
-                        <td>Socio</td>
-                        <td></td>
-                        <td></td>
+                        <td><a href="" class="clickable" target="_blank" rel="noopener noreferrer">2</a></td>
+                        <td>DJ</td>
+                        <td>-</td>
+                        <td>+573215340988</td>
+                        <td>-</td>
+                        <td>-</td>
                     </tr>
 <tr>
-                        <td><a href="https://barasurdito.contraentregaco.com" class="clickable" target="_blank" rel="noopener noreferrer">3. @barasurdito</a></td>
-                        <td>Socio</td>
-                        <td></td>
-                        <td></td>
+                        <td><a href="https://co.contraentregaco.com/collections/18jcpm" class="clickable" target="_blank" rel="noopener noreferrer">3</a></td>
+                        <td>DJ</td>
+                        <td>-</td>
+                        <td>+573215340988</td>
+                        <td>-</td>
+                        <td>-</td>
                     </tr>
                 </tbody>
             </table>
         </section>
 
+<!-- lnurl -->
+<a id="lnurl" href="#">Generar factura</a>
+<script>generarFacturaLNURL(10000);</script>
+
+
+<!-- oferta -->
+<p id="ultimaOferta">No hay ofertas aún.</p>
+<input type="number" id="montoOferta" placeholder="Ingrese BTC">
+<button onclick="hacerOferta(document.getElementById('montoOferta').value)">Ofertar</button>
+
+
+<!-- xmpp -->
+<input type="text" id="mensaje" placeholder="Escribe tu mensaje">
+<button onclick="enviarMensaje('vendedor@tu-servidor-xmpp.com', document.getElementById('mensaje').value)">Enviar</button>
+
+
+<!-- recarga -->
+<button onclick="recargarSaldo(10000)">Recargar 10,000 Satoshis</button>
+
+
+<!-- nostr -->
+<button onclick="loginConNostr()">Iniciar sesión con Nostr</button>
+
+
+<!-- referido -->
+<input type="text" id="enlaceReferido" readonly>
+<button onclick="navigator.clipboard.writeText(document.getElementById('enlaceReferido').value)">Copiar Enlace</button>
+
+
+<!-- nfc -->
+<button onclick="pagarConNFC()">Pagar con NFC</button>
+
+
+<!-- metamask -->
+<button onclick="pagarConMetaMask()">Pagar con MetaMask</button>
             <!-- Footer -->
         <footer class="footer">
             <p>&copy; <span id="year"></span> <strong>Cordientrega</strong></p>
@@ -274,70 +316,55 @@
     </div>
 
 <script>
-// Precios fijos en COP para cada producto
+// Lista de precios en COP para cada producto
 const preciosCOP = {
-    producto1: 500000, // Precio en COP para Producto 1
-    producto2: 10000000, // Precio en COP para Producto 2
-    producto3: 150000, // Precio en COP para Producto 3 
-    producto4: 500000  // Precio en COP para Producto 4 
+    producto1: 500000,  // Precio en COP del producto 1
+    producto2: 10000000, // Precio en COP del producto 2
+    producto3: 150000,  // Precio en COP del producto 3
+    producto4: 500000   // Precio en COP del producto 4
 };
 
-// Función para obtener el precio de BTC en USD desde CoinGecko
-async function obtenerPrecioBTC() {
+// API para obtener precios de Bitcoin y tasa de cambio COP a USD
+const COINGECKO_API = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,cop";
+
+// Función para obtener el precio de BTC en USD y la tasa de conversión COP a USD
+async function obtenerDatosDeMercado() {
     try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd');
+        const response = await fetch(COINGECKO_API);
         const data = await response.json();
-        console.log("Precio de BTC en USD:", data.bitcoin.usd);
-        return data.bitcoin.usd;
+        return {
+            precioBTC: data.bitcoin.usd,  // Precio de 1 BTC en USD
+            tasaCOPaUSD: data.bitcoin.cop // Precio de 1 USD en COP
+        };
     } catch (error) {
-        console.error("Error obteniendo el precio de BTC:", error);
+        console.error("Error obteniendo datos del mercado:", error);
         return null;
     }
 }
 
-// Función para obtener el tipo de cambio COP a USD
-async function obtenerTipoDeCambioCOPaUSD() {
-    try {
-        const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=usd&vs_currencies=cop');
-        const data = await response.json();
-        console.log("Tipo de cambio COP a USD:", data.usd.cop);
-        return data.usd.cop;
-    } catch (error) {
-        console.error("Error obteniendo el tipo de cambio COP a USD:", error);
-        return null;
-    }
-}
-
-// Función para calcular el precio en Lightning (en satoshis)
+// Función para calcular el precio en satoshis basado en COP
 async function calcularPrecioLightning(cop) {
-    const tipoDeCambioCOPaUSD = await obtenerTipoDeCambioCOPaUSD();
-    if (!tipoDeCambioCOPaUSD) {
-        console.error("No se pudo obtener el tipo de cambio COP a USD.");
+    const datosMercado = await obtenerDatosDeMercado();
+    if (!datosMercado) {
+        console.error("No se pudieron obtener datos del mercado.");
         return null;
     }
 
-    const precioUSD = cop / tipoDeCambioCOPaUSD;
-    console.log("Precio en USD:", precioUSD);
-
-    const precioBTC = await obtenerPrecioBTC();
-    if (!precioBTC) {
-        console.error("No se pudo obtener el precio de BTC.");
-        return null;
-    }
-
-    console.log("Precio de BTC:", precioBTC);
-
-    const montoBTC = precioUSD / precioBTC;
+    const precioUSD = cop / datosMercado.tasaCOPaUSD; // Convertimos COP a USD
+    const montoBTC = precioUSD / datosMercado.precioBTC; // Convertimos USD a BTC
     const montoSatoshis = Math.round(montoBTC * 100000000); // Convertimos BTC a satoshis
-    console.log("Monto en satoshis:", montoSatoshis);
 
     return montoSatoshis;
 }
 
-// Función para generar el precio en Lightning de cada producto y el enlace correspondiente
+// Función para generar un enlace de pago Lightning (personalizar según el sistema que uses)
+function generarEnlaceLightning(satoshis) {
+    return `lightning:lnbc${satoshis}0n1p...`; // Aquí debes integrar con tu nodo Lightning
+}
+
+// Función para actualizar los precios y enlaces Lightning en la página
 async function actualizarPrecios() {
     for (const [producto, precioCOP] of Object.entries(preciosCOP)) {
-        // Calculamos el precio en Lightning para el producto
         const precioLightning = await calcularPrecioLightning(precioCOP);
         if (precioLightning !== null) {
             // Actualizamos el precio en el HTML
@@ -349,68 +376,260 @@ async function actualizarPrecios() {
             // Actualizamos el enlace de pago
             const linkElement = document.getElementById(`link-lightning-${producto}`);
             if (linkElement) {
-                linkElement.setAttribute('href', `lightning:lnbc1pnc7zscpp5pad0vy96m86ezk7z95d92tl87k97x0xst07rkex77gmqyalt56jsdqqcqzzgxqyz5vqrzjqwnvuc0u4txn35cafc7w94gxvq5p3cu9dd95f7hlrh0fvs46wpvhdr88fux277w9wsqqqqryqqqqthqqpysp5aavhww3dn4f92r59kfj2vca2x58je2a4e6gpxfcd85ze6wgaap9s9qrsgq8snrrprr0th0n0r6y0fwxdsm47a08w9qh0m4tztw6czwn3swgvm3s8gp2w86p87pl2mkctpuhj7qhpdzh6d7r7hquy2pyh65wquclxgpf6u3am?message=Pago%20por%20${producto}&amount=${precioLightning}`);
+                linkElement.setAttribute('href', generarEnlaceLightning(precioLightning));
             }
-        } else {
-            console.error(`Error al obtener el precio en Lightning para ${producto}`);
         }
     }
 }
 
-// Función para agregar productos dinámicamente al HTML
-function agregarProductosAlHTML() {
-    const container = document.getElementById('productos-container');
-    if (container) {
-        for (const producto in preciosCOP) {
-            const productoDiv = document.createElement('div');
-            productoDiv.classList.add('product');
-            productoDiv.innerHTML = `
-                <h2>${producto}</h2>
-                <p id="precio-lightning-${producto}">Cargando precio...</p>
-                <a id="link-lightning-${producto}" href="#">Pagar con Lightning</a>
-            `;
-            container.appendChild(productoDiv);
-        }
+// Llamamos a la función para actualizar los precios al cargar la página
+document.addEventListener("DOMContentLoaded", actualizarPrecios);
+
+// Función para filtrar la tabla de inventario en tiempo real
+function searchContacts() {
+    const input = document.getElementById("searchContactInput").value.toLowerCase();
+    const table = document.querySelector("table tbody");
+    const rows = table.getElementsByTagName("tr");
+
+    for (let row of rows) {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(input) ? "" : "none";
     }
 }
 
-// Función para buscar productos
-function searchProducts() {
-    const input = document.getElementById('searchInput');
-    const filter = input ? input.value.toLowerCase() : '';
-    const products = document.querySelectorAll('.product');
-
-    products.forEach(product => {
-        const title = product.querySelector('h2').textContent.toLowerCase();
-        product.style.display = title.includes(filter) ? 'block' : 'none';
+async function generarFacturaLNURL(montoSatoshis) {
+    const endpoint = "https://lnbits.com/api/v1/payments"; // Modifica con tu endpoint real
+    const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: montoSatoshis, memo: "Compra en e-commerce" })
     });
+    const data = await response.json();
+    if (data.payment_request) {
+        document.getElementById("lnurl").href = `lightning:${data.payment_request}`;
+        document.getElementById("lnurl").innerText = "Pagar con Lightning";
+    }
 }
 
-// Actualizar el año en el footer
-document.getElementById("year").textContent = new Date().getFullYear();
+const socket = new WebSocket("wss://tu-nodo-lnd.com/ws"); // Reemplaza con tu nodo
 
-// Actualizar precios cuando la página se carga
-window.onload = function() {
-    agregarProductosAlHTML(); // Agregar productos al HTML
-    actualizarPrecios();      // Actualizar los precios en Lightning
+socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === "payment_received") {
+        alert(`Pago recibido: ${data.amount} satoshis`);
+        location.reload();
+    }
 };
 
-function searchContacts() {
-    const input = document.getElementById('searchContactInput').value.toLowerCase().trim();
-    const rows = document.querySelectorAll("table tbody tr");
+async function enviarNotificacionTelegram(mensaje) {
+    const token = "TU_TELEGRAM_BOT_TOKEN";
+    const chatId = "TU_CHAT_ID";
+    const url = `https://api.telegram.org/bot${token}/sendMessage`;
 
-    rows.forEach(row => {
-        const nameElement = row.querySelector("td a"); // Buscar el <a> dentro del <td>
-        
-        if (nameElement) {
-            const name = nameElement.textContent.toLowerCase();
-            row.style.display = name.includes(input) ? "" : "none"; // Mostrar u ocultar filas
+    await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ chat_id: chatId, text: mensaje })
+    });
+}
+
+const socket = new WebSocket("wss://tu-nodo-lnd.com/ws"); // WebSocket de LND
+
+socket.onmessage = async (event) => {
+    const data = JSON.parse(event.data);
+    if (data.type === "payment_received") {
+        const mensaje = `Pago recibido: ${data.amount} satoshis en Lightning Network`;
+        await enviarNotificacionTelegram(mensaje);
+    }
+};
+
+async function generarFacturaYConfirmar(montoSatoshis) {
+    const endpoint = "https://tu-servidor-lnd.com/api/v1/payments"; // Cambia con tu API LNBits
+    const response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: montoSatoshis, memo: "Compra en e-commerce" })
+    });
+    const data = await response.json();
+
+    if (data.payment_request) {
+        document.getElementById("lnurl").href = `lightning:${data.payment_request}`;
+        document.getElementById("lnurl").innerText = "Pagar con Lightning";
+    }
+
+    // Escuchar la confirmación de pago
+    const socket = new WebSocket(`wss://tu-servidor-lnd.com/ws/${data.payment_hash}`);
+    socket.onmessage = (event) => {
+        const pago = JSON.parse(event.data);
+        if (pago.settled) {
+            alert("Pago confirmado en Lightning!");
+            location.reload();
+        }
+    };
+}
+
+document.addEventListener("DOMContentLoaded", () => generarFacturaYConfirmar(10000));
+
+async function enviarEventoNostr(pubkey, mensaje) {
+    const nostrEvento = {
+        kind: 1,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [["p", pubkey]],
+        content: mensaje
+    };
+
+    if (window.nostr) {
+        await window.nostr.signEvent(nostrEvento);
+        const relays = ["wss://relay.damus.io"];
+        relays.forEach((relay) => {
+            const ws = new WebSocket(relay);
+            ws.onopen = () => ws.send(JSON.stringify(["EVENT", nostrEvento]));
+        });
+    } else {
+        alert("Nostr no está disponible.");
+    }
+}
+
+// Simulación de pago recibido
+const pagoRecibido = {
+    pubkey: "npub1example...",
+    amount: 10000
+};
+
+enviarEventoNostr(pagoRecibido.pubkey, `Has recibido ${pagoRecibido.amount} satoshis! ⚡`);
+
+const socket = new WebSocket("wss://tu-servidor.com/subasta");
+
+function hacerOferta(monto) {
+    socket.send(JSON.stringify({ tipo: "oferta", usuario: "Usuario123", monto }));
+}
+
+socket.onmessage = (event) => {
+    const data = JSON.parse(event.data);
+    if (data.tipo === "nueva_oferta") {
+        document.getElementById("ultimaOferta").innerText = `${data.usuario} ofertó ${data.monto} BTC`;
+    }
+};
+
+const BOSH_SERVICE = "https://tu-servidor-xmpp.com/http-bind/";
+const XMPP_DOMAIN = "tu-servidor-xmpp.com";
+const usuario = "comprador@tu-servidor-xmpp.com";
+const password = "clave123";
+
+const connection = new Strophe.Connection(BOSH_SERVICE);
+
+function conectarXMPP() {
+    connection.connect(usuario, password, (status) => {
+        if (status === Strophe.Status.CONNECTED) {
+            console.log("Conectado a XMPP");
+            connection.addHandler(recibirMensaje, null, "message", "chat");
+        } else if (status === Strophe.Status.AUTHFAIL) {
+            console.log("Fallo en la autenticación");
         }
     });
 }
+
+function recibirMensaje(msg) {
+    const from = msg.getAttribute("from");
+    const body = msg.getElementsByTagName("body")[0].textContent;
+    console.log(`Mensaje de ${from}: ${body}`);
+    return true;
+}
+
+function enviarMensaje(destinatario, mensaje) {
+    const reply = $msg({ to: destinatario, type: "chat" }).c("body").t(mensaje);
+    connection.send(reply);
+}
+
+document.addEventListener("DOMContentLoaded", conectarXMPP);
+
+async function recargarSaldo(montoSatoshis) {
+    const response = await fetch("/api/crear-lnurl", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ amount: montoSatoshis })
+    });
+
+    const data = await response.json();
+    if (data.lnurl) {
+        window.location.href = `lightning:${data.lnurl}`;
+    }
+}
+
+async function publicarEnNostr(producto) {
+    const evento = {
+        kind: 1,
+        created_at: Math.floor(Date.now() / 1000),
+        tags: [["e", "publicaciones"]],
+        content: `🛒 Nuevo producto: ${producto.nombre} - ${producto.precio} sats ⚡`
+    };
+
+    if (window.nostr) {
+        await window.nostr.signEvent(evento);
+        const relay = new WebSocket("wss://relay.damus.io");
+        relay.onopen = () => relay.send(JSON.stringify(["EVENT", evento]));
+    }
+}
+
+const nuevoProducto = { nombre: "Camiseta Bitcoin", precio: 50000 };
+publicarEnNostr(nuevoProducto);
+
+function generarEnlaceReferido() {
+    const usuarioId = "user123"; // Este ID debe ser dinámico según el usuario autenticado
+    const enlaceReferido = `${window.location.origin}/?ref=${usuarioId}`;
+    document.getElementById("enlaceReferido").value = enlaceReferido;
+}
+
+document.addEventListener("DOMContentLoaded", generarEnlaceReferido);
+
+async function registrarCompra() {
+    const params = new URLSearchParams(window.location.search);
+    const referido = params.get("ref");
+
+    if (referido) {
+        await fetch("/api/registrar-referido", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ referido, monto: 5000 }) // 5000 Satoshis de recompensa
+        });
+    }
+}
+
+document.addEventListener("DOMContentLoaded", registrarCompra);
+
+async function pagarConNFC() {
+    if (!("NDEFReader" in window)) {
+        alert("Tu dispositivo no soporta NFC.");
+        return;
+    }
+
+    const nfc = new NDEFReader();
+    await nfc.write("lightning:lnurlp_tu_codigo");
+
+    alert("Pago procesado con Lightning NFC.");
+}
+
+async function pagarConMetaMask() {
+    if (!window.ethereum) {
+        alert("Instala MetaMask para continuar.");
+        return;
+    }
+
+    const accounts = await ethereum.request({ method: "eth_requestAccounts" });
+    const direccion = accounts[0];
+
+    await ethereum.request({
+        method: "eth_sendTransaction",
+        params: [{ from: direccion, to: "DIRECCION_BTC", value: "10000000000000000" }]
+    });
+
+    alert("Pago enviado.");
+}
+
+// Actualizar el año en el footer automáticamente
+document.getElementById("year").innerText = new Date().getFullYear();
 
 </script>
 
 </body>
 </html>
-

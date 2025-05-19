@@ -247,6 +247,14 @@
             right: 20px;
             z-index: 1000;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+        /* Para el deslizamiento de imágenes */
+        .swipe-area {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            touch-action: pan-y;
         }
     </style>
 </head>
@@ -312,7 +320,9 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="product-gallery">
-                        <img id="modalMainImage" src="" class="main-product-image" alt="Imagen principal del producto" onclick="openImageModal(this.src)">
+                        <div class="swipe-area" id="swipeArea">
+                            <img id="modalMainImage" src="" class="main-product-image" alt="Imagen principal del producto" onclick="openImageModal(this.src)">
+                        </div>
                         <div class="gallery-nav">
                             <button onclick="navigateGallery(-1)"><i class="bi bi-chevron-left"></i></button>
                             <button onclick="navigateGallery(1)"><i class="bi bi-chevron-right"></i></button>
@@ -658,6 +668,8 @@
         let currentOrderId = "";
         let currentProduct = null;
         let currentImageIndex = 0;
+        let touchStartX = 0;
+        let touchEndX = 0;
 
         // Inicialización
         document.addEventListener('DOMContentLoaded', function() {
@@ -672,7 +684,62 @@
                     updateOrderSummary();
                 });
             });
+
+            // Configurar el botón de carrito fijo
+            setupFixedCartButton();
+
+            // Configurar el deslizamiento de imágenes
+            setupImageSwipe();
         });
+
+        // Configurar el botón de carrito fijo
+        function setupFixedCartButton() {
+            const fixedCartBtn = document.querySelector('.fixed-cart-btn');
+            
+            window.addEventListener('scroll', function() {
+                // Mostrar siempre el botón en móvil
+                if (window.innerWidth <= 768) {
+                    fixedCartBtn.style.display = 'block';
+                    fixedCartBtn.style.bottom = '20px';
+                    fixedCartBtn.style.right = '20px';
+                } else {
+                    // En desktop, hacerlo más discreto cuando se hace scroll
+                    if (window.scrollY > 100) {
+                        fixedCartBtn.style.bottom = '20px';
+                        fixedCartBtn.style.right = '20px';
+                    } else {
+                        fixedCartBtn.style.bottom = '20px';
+                        fixedCartBtn.style.right = '20px';
+                    }
+                }
+            });
+        }
+
+        // Configurar el deslizamiento de imágenes
+        function setupImageSwipe() {
+            const swipeArea = document.getElementById('swipeArea');
+            
+            if (swipeArea) {
+                swipeArea.addEventListener('touchstart', function(e) {
+                    touchStartX = e.changedTouches[0].screenX;
+                }, false);
+
+                swipeArea.addEventListener('touchend', function(e) {
+                    touchEndX = e.changedTouches[0].screenX;
+                    handleSwipe();
+                }, false);
+            }
+        }
+
+        function handleSwipe() {
+            if (touchStartX - touchEndX > 50) {
+                // Deslizamiento a la izquierda - siguiente imagen
+                navigateGallery(1);
+            } else if (touchEndX - touchStartX > 50) {
+                // Deslizamiento a la derecha - imagen anterior
+                navigateGallery(-1);
+            }
+        }
 
         // Actualizar fecha y hora
         function updateDateTime() {

@@ -10,6 +10,7 @@
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background-color: #f8f9fa;
+            padding-bottom: 70px; /* Espacio para el botón fijo */
         }
         .navbar-brand {
             font-weight: 700;
@@ -244,10 +245,16 @@
         .fixed-cart-btn {
             position: fixed;
             bottom: 20px;
-            right: 20px;
+            left: 50%;
+            transform: translateX(-50%);
             z-index: 1000;
             box-shadow: 0 4px 8px rgba(0,0,0,0.2);
             transition: all 0.3s ease;
+            width: 90%;
+            max-width: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         /* Para el deslizamiento de imágenes */
         .swipe-area {
@@ -400,11 +407,6 @@
                                     <label for="customerPhone" class="form-label">Teléfono*</label>
                                     <input type="tel" class="form-control" id="customerPhone" required pattern="[0-9]{10}" title="El teléfono debe tener 10 dígitos">
                                     <div class="invalid-feedback">Por favor ingresa un número de teléfono válido (10 dígitos).</div>
-                                </div>
-                                <div class="mb-3">
-                                    <label for="customerEmail" class="form-label">Correo electrónico*</label>
-                                    <input type="email" class="form-control" id="customerEmail" required>
-                                    <div class="invalid-feedback">Por favor ingresa un correo electrónico válido.</div>
                                 </div>
                                 <div class="mb-3" id="addressField" style="display: none;">
                                     <label for="customerAddress" class="form-label">Dirección completa*</label>
@@ -696,22 +698,12 @@
         function setupFixedCartButton() {
             const fixedCartBtn = document.querySelector('.fixed-cart-btn');
             
+            // Mostrar siempre el botón
+            fixedCartBtn.style.display = 'flex';
+            
+            // Asegurarse de que esté visible al hacer scroll
             window.addEventListener('scroll', function() {
-                // Mostrar siempre el botón en móvil
-                if (window.innerWidth <= 768) {
-                    fixedCartBtn.style.display = 'block';
-                    fixedCartBtn.style.bottom = '20px';
-                    fixedCartBtn.style.right = '20px';
-                } else {
-                    // En desktop, hacerlo más discreto cuando se hace scroll
-                    if (window.scrollY > 100) {
-                        fixedCartBtn.style.bottom = '20px';
-                        fixedCartBtn.style.right = '20px';
-                    } else {
-                        fixedCartBtn.style.bottom = '20px';
-                        fixedCartBtn.style.right = '20px';
-                    }
-                }
+                fixedCartBtn.style.bottom = '20px';
             });
         }
 
@@ -1103,7 +1095,6 @@
             const customerDetails = {
                 name: document.getElementById('customerName').value,
                 phone: document.getElementById('customerPhone').value,
-                email: document.getElementById('customerEmail').value,
                 address: deliveryMethod === 'delivery' ? document.getElementById('customerAddress').value : 'Recoger en tienda'
             };
 
@@ -1131,7 +1122,6 @@
                 Cliente:
                 Nombre: ${customerDetails.name}
                 Teléfono: ${customerDetails.phone}
-                Email: ${customerDetails.email}
                 Dirección: ${customerDetails.address}
                 
                 Items:
@@ -1154,7 +1144,6 @@
                 _subject: `Nuevo pedido ${currentOrderId}`,
                 name: customerDetails.name,
                 phone: customerDetails.phone,
-                email: customerDetails.email,
                 address: customerDetails.address,
                 paymentMethod: paymentMethod,
                 items: detailedMessage, // Mantener para compatibilidad
